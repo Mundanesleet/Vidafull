@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programar Citas</title>
+
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css" rel="stylesheet" />
+
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+        }
+
+
+        .icono-texto {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            outline: none;
+            text-decoration: none;
+            /* Elimina cualquier subrayado en el enlace */
+        }
+
+        .icono-texto a {
+            color: #D90404;
+            /* Color del enlace (rojo en este caso) */
+            text-decoration: none;
+            /* Elimina la línea debajo del texto */
+        }
+
+        .icono-texto i {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #F7F6F7;
+            border-radius: 6px;
+            transition: background-color 0.3s, color 0.3s;
+            color: #D90404;
+        }
+
+        .icono-texto.activo i {
+            background-color: #FFEEEE;
+            color: #D90404;
+        }
+
+        .icono-texto p {
+            color: #000;
+            margin: 0;
+        }
+
+        .icono-texto:hover i {
+            background-color: #FFEEEE;
+            color: #D90404;
+        }
+
+
+
+        #calendario {
+            width: 100%;
+            height: 600px;
+        }
+
+        .fc-toolbar-title {
+            color: #D90404;
+        }
+
+        .fc-button {
+            border-radius: 100px !important;
+            padding: 0.5rem;
+        }
+
+        .fc-prev-button,
+        .fc-next-button {
+            background-color: #D90404 !important;
+            border: 1px solid #D90404 !important;
+            border-radius: 100px !important;
+            color: #fdfdfd;
+
+        }
+
+        .fc-prev-button span,
+        .fc-next-button span {
+            font-size: 1.2rem;
+            color: #fdfdfd;
+            /* Color del símbolo */
+            font-weight: bold;
+        }
+
+        .fc-prev-button:hover,
+        .fc-next-button:hover {
+            background-color: #ddd;
+        }
+
+        /* Cambiar color del número del día */
+        .fc-daygrid-day-number {
+            color: #D90404;
+            /* Cambia esto al color que quieras */
+            font-weight: bold;
+            /* Opcional: darle peso al texto */
+            text-decoration: none;
+            /* Asegúrate de que no haya subrayado */
+            border: none;
+            /* Asegúrate de que no haya borde */
+        }
+
+        /* Posicionar el número en la parte inferior izquierda del cuadro */
+        .fc-daygrid-day-top {
+            position: relative;
+            /* Asegura que el contenedor padre esté posicionado */
+        }
+
+        .fc-daygrid-day-number {
+            position: absolute;
+            bottom: -50px;
+            /* Ajusta según la distancia deseada del borde inferior */
+            left: -150px;
+            /* Ajusta según la distancia deseada del borde izquierdo */
+            font-size: 1rem;
+            /* Ajusta el tamaño del texto */
+        }
+
+
+
+
+
+        .custom-month {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin: 5px;
+            border-radius: 5px;
+            background-color: #f7f7f7;
+            display: inline-block;
+        }
+
+        .ver-citas-btn {
+            margin-top: 5px;
+            background-color: #D90404;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .ver-citas-btn:hover {
+            background-color: #a00303;
+        }
+
+
+        /* Estilo básico del calendario */
+        .day {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            margin: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+        }
+
+        /* Estilo del día seleccionado */
+        .selected {
+            background-color: #FFEEEE !important;
+            /* Cambia el color de fondo de la fecha seleccionada */
+            color: black !important;
+            /* Cambia el color del texto de la fecha seleccionada */
+            border: 2px solid #D90404 !important;
+            /* Cambia el borde a 1px y color rojo */
+            box-sizing: border-box !important;
+            /* Incluye el borde en el tamaño total del elemento */
+
+
+        }
+
+
+        /* Contenedor para la fecha seleccionada */
+        .selected-date {
+            text-align: center;
+            width: 100%;
+            /* Color de fondo */
+            color: #D90404;
+            /* Color del texto */
+            font-size: 2rem;
+
+            margin-top: 10px;
+        }
+
+
+        .btn-hor {
+            height: 40%;
+            width: 100%;
+        }
+
+        .custom-btn {
+            background-color: #AEF2F2;
+            border: 1px solid #47DBF9;
+            border-radius: 0;
+            color: rgb(0, 0, 0);
+        }
+
+        .custom-btn:hover {
+            background-color: #0056b3;
+            border-color: #004080;
+        }
+
+
+
+
+
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            /* Centra los botones horizontalmente */
+            gap: 10px;
+            /* Espacio entre los botones */
+        }
+
+        .custom-btn-programar,
+        .custom-btn-borrar {
+            width: 100%;
+            /* Ajusta el ancho del botón */
+            height: 50px;
+            /* Ajusta la altura del botón */
+            font-size: 18px;
+            /* Tamaño del texto */
+
+
+            border-radius: 8px;
+            /* Bordes redondeados */
+            transition: opacity 0.2s;
+            /* Transición en hover */
+        }
+
+        .custom-btn-programar {
+            background-color: #a4f0ff;
+            /* Color de fondo del botón de "Programar" */
+            color: #000;
+            /* Color del texto */
+            border: 2px solid #0CCDF8;
+            /* Borde del mismo color que el fondo */
+        }
+
+        .custom-btn-borrar {
+            background-color: #ffe5e5;
+            /* Color de fondo del botón de "Borrar" */
+            color: #000;
+            /* Color del texto */
+            border: 2px solid #F2A7A7;
+            /* Borde del mismo color que el fondo */
+        }
+
+        .custom-btn-programar:hover,
+        .custom-btn-borrar:hover {
+            opacity: 0.8;
+            /* Efecto de opacidad en hover */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 d-flex flex-column">
+        <div class="row" style="height: 15%;">
+            <div class="col-1 logo">
+                <img src="../../static/img/logo.png" alt="Logo" class="img-fluid" style="margin-top: 25%;">
+            </div>
+            <div class="col-8 d-flex justify-content-center align-items-center">
+                <div class="input-group" style="margin-top: 3%;">
+                    <span class="input-group-text"
+                        style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control rounded-start" placeholder="Buscar fechas"
+                        aria-label="Buscar" style="background-color: #F7F6F7;">
+                </div>
+
+            </div>
+
+
+            <div class="col-2 d-flex justify-content-center align-items-center text-align-start flex-grow-1">
+                <div class="selected-date" id="selectedDates"></div>
+            </div>
+
+
+        </div>
+
+        <div class="row flex-fill" style="height: 85%; text-align: center;">
+            <div class="col-1 d-flex flex-column align-items-center justify-content-around">
+                <a href="{% url 'citas' %}" class="icono-texto {% if pagina_actual == 'citas' %}activo{% endif %}">
+                    <i class="bi bi-list-task" style="font-size: 2rem;"></i>
+                    <p>Citas</p>
+                </a>
+
+                <a href="{% url 'programar_cita' %}" class="icono-texto {% if pagina_actual == 'programar' %}activo{% endif %}">
+                    <i class="bi bi-calendar-plus" style="font-size: 2rem;"></i>
+                    <p>Programar</p>
+                </a>
+
+                <a href="{% url 'inicio' %}" class="icono-texto {% if pagina_actual == 'pacientes' %}activo{% endif %}">
+                    <i class="bi bi-clipboard2-check" style="font-size: 2rem;"></i>
+                    <p>Pacientes</p>
+                </a>
+            </div>
+
+
+
+            <div class="col-8 inferior">
+                <div id="calendario"></div>
+            </div>
+
+
+
+            <div class="col-2 d-flex flex-column">
+                <div class="btn-hor" style="height: 35%; width: 140%; margin-left: 5%;">
+
+                    <div class="container">
+                        <p class="text-danger display-6"
+                            style="text-align: left; font-size: 2rem; margin-bottom: 0.5rem;"><b>Hora</b></p>
+                        <br>
+                        <div class="row g-0" style="margin-bottom: 0.25rem;">
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">07:00 am</button>
+                            </div>
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">08:00 am</button>
+                            </div>
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">09:00 am</button>
+                            </div>
+                        </div>
+                        <div class="row g-0" style="margin-bottom: 0.25rem;">
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">10:00 am</button>
+                            </div>
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">11:00 am</button>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row g-0" style="margin-bottom: 0.25rem;">
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">12:00 pm</button>
+                            </div>
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">01:00 pm</button>
+                            </div>
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">02:00 pm</button>
+                            </div>
+                        </div>
+                        <div class="row g-0" style="margin-bottom: 0.25rem;">
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">03:00 pm</button>
+                            </div>
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">04:00 pm</button>
+                            </div>
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">05:00 pm</button>
+                            </div>
+                        </div>
+                        <div class="row g-0">
+                            <div class="col-4 p-0">
+                                <button class="btn custom-btn w-100" style="font-size: 0.8rem;">06:00 pm</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                <div class="container text-center mt-5" style="margin-left: 5%; width: 140%; height: 12%;">
+                    <h5 class="mb-3" style="color: #D90404; text-align: start;">Ciudad</h5>
+                    <div class="input-group mb-3">
+                        <select id="city-select" class="form-select">
+                            <option selected>Seleccionar ciudad...</option>
+                            {% for ciudad in ciudades %}
+                            <option value="{{ ciudad.id }}">{{ ciudad.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% for ciudad in ciudades %}
+                            <li><a class="dropdown-item" href="#">{{ ciudad.nombre }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+
+                <div class="container text-center mt-5" style="margin-left: 5%; width: 140%; height: 12%;">
+                    <h5 class="mb-3" style="color: #D90404; text-align: start;">Direccion</h5>
+                    <div class="input-group mb-3">
+                        <select id="direccion-select" class="form-select">
+                            <option selected>¿Donde estaras?</option>
+                            {% for direccion in direcciones %}
+                            <option value="{{ direccion.id }}">{{ direccion.direccion }}</option>
+                            {% endfor %}
+                        </select>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% for direccion in direcciones %}
+                            <li><a class="dropdown-item" href="#">{{ direccion.direccion }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="container text-center mt-5" style="margin-left: 5%; width: 140%;">
+                    <div class="mb-3 button-container">
+                        <button type="button" class="btn btn-primary custom-btn-programar">Programar</button>
+                        <button type="button" class="btn btn-danger custom-btn-borrar">Borrar</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectedDates = []; // Inicializar el array de fechas seleccionadas
+            const today = new Date(); // Obtener la fecha actual
+
+            const calendario = new FullCalendar.Calendar(document.getElementById('calendario'), {
+                initialView: 'dayGridMonth',
+                locale: 'es',
+                headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+                dateClick: info => {
+                    // Obtener la fecha completa en la zona horaria local
+                    const clickedDate = new Date(info.date);
+
+                    // Convertirla al formato 'YYYY-MM-DD' en la zona horaria local
+                    const localDateStr = clickedDate.toLocaleDateString('en-GB');  // Usa 'en-GB' para 'DD/MM/YYYY'
+
+                    // Verificar si la fecha ya está seleccionada
+                    if (selectedDates.includes(localDateStr)) {
+                        // Si está seleccionada, eliminarla del array y actualizar la visualización
+                        selectedDates.splice(selectedDates.indexOf(localDateStr), 1);
+                        info.dayEl.classList.remove('selected'); // Remover el estilo
+                    } else {
+                        // Si no está seleccionada, agregarla al array
+                        selectedDates.push(localDateStr);
+                        info.dayEl.classList.add('selected'); // Agregar el estilo
+                    }
+
+                    // Actualizar las fechas seleccionadas y mostrarlas
+                    updateSelectedDatesDisplay();
+                },
+
+
+                events: [], // Sin eventos predefinidos
+                eventColor: '#378006',
+                dayCellDidMount: info => {
+                    // Marcar días seleccionados
+                    if (selectedDates.includes(info.dateStr)) {
+                        info.el.classList.add('selected'); // Agregar la clase de estilo
+                    }
+
+                    // Obtener el número del día directamente desde info.date
+                    const dayNumber = info.date.getDate(); // Obtener el día del mes (1-31)
+
+                    // Formatear el día para que tenga un 0 delante si es menor que 10
+                    const formattedDayNumber = dayNumber < 10 ? `0${dayNumber}` : dayNumber;
+
+                    // Cambiar el texto del día en el elemento correspondiente solo si está vacío
+                    if (!info.el.innerText) {
+                        info.el.innerText = formattedDayNumber; // Cambiar el texto del día a solo el número formateado
+                    }
+                }
+            });
+
+            calendario.render();
+            calendario.gotoDate(today); // Establecer la fecha predeterminada en el calendario
+
+            const updateSelectedDatesDisplay = () => {
+                const selectedDatesContainer = document.getElementById('selectedDates');
+
+                // Mostrar el día actual al cargar la página
+                const currentDay = new Date();
+                const options = { weekday: 'long', day: 'numeric' };
+                const formattedCurrentDay = currentDay.toLocaleDateString('es-ES', options);
+                const capitalizedCurrentDay = formattedCurrentDay.charAt(0).toUpperCase() + formattedCurrentDay.slice(1);
+
+                // Mostrar el día actual si no hay fechas seleccionadas
+                if (selectedDates.length === 0) {
+                    selectedDatesContainer.innerText = capitalizedCurrentDay; // Mostrar el día actual
+                    return;
+                }
+
+                // Ordenar las fechas seleccionadas
+                selectedDates.sort((a, b) => new Date(a) - new Date(b));
+
+                // Obtener la menor y mayor fecha
+                const start = new Date(selectedDates[0]);
+                const end = new Date(selectedDates[selectedDates.length - 1]);
+
+                // Obtener el día y el número de la fecha
+                const startFormatted = start.toLocaleDateString('es-ES', options).replace(/^./, c => c.toUpperCase());
+                const endFormatted = end.toLocaleDateString('es-ES', options).replace(/^./, c => c.toUpperCase());
+
+                // Mostrar las fechas seleccionadas
+                selectedDatesContainer.innerText =
+                    selectedDates.length === 1 ? startFormatted : `${startFormatted} - ${endFormatted}`;
+            };
+
+            // Llamar a la función para mostrar el día actual al cargar la página
+            updateSelectedDatesDisplay();
+        });
+
+    </script>
+    </div>
+</body>
+
+</html>

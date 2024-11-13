@@ -1,0 +1,171 @@
+{% extends 'citas/base.html' %}
+
+{% block title %}
+    Página de Citas
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header con búsqueda -->
+    <div class="row bg-light p-3">
+        <div class="col-md-12">
+            <input type="text" class="form-control" placeholder="Buscar fechas">
+        </div>
+    </div>
+
+    <div class="row" style="height: 90vh;">
+        <!-- Columna izquierda (8% vertical) con separación por líneas rojas -->
+        <div class="col-1 bg-transparent text-white text-center d-flex flex-column align-items-center justify-content-between" style="height: 100%; border-right: 2px solid #e84c3d;">
+            <!-- Logo -->
+            <div class="mt-3">
+                <!-- Puedes colocar aquí el logo si lo deseas -->
+            </div>
+
+            <!-- Botones visuales -->
+            <div class="my-3">
+                <a href="#" class="text-white">
+                    <i class="fas fa-calendar-alt fa-3x"></i>
+                    <p>Citas</p>
+                </a>
+            </div>
+            <div class="my-3">
+                <a href="#" class="text-white">
+                    <i class="fas fa-calendar-plus fa-3x"></i>
+                    <p>Programar</p>
+                </a>
+            </div>
+            <div class="my-3">
+                <a href="#" class="text-white">
+                    <i class="fas fa-history fa-3x"></i>
+                    <p>Historial</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Centro (Calendario, 70%) -->
+        <div class="col-7 d-flex justify-content-center align-items-center bg-light">
+            <!-- Placeholder del calendario -->
+            <div id="calendar" style="border: 2px solid #d1d1d1; height: 85vh; width: 90%; padding: 20px; border-radius: 10px;">
+                <h2 class="text-center">Calendario Aquí</h2>
+            </div>
+        </div>
+
+        <!-- Columna derecha (30%) con separación por líneas rojas -->
+        <div class="col-4 bg-white text-center" style="border-left: 2px solid #e84c3d;">
+            <!-- Fecha de hoy -->
+            <div class="my-4">
+                <h3>Fecha de hoy</h3>
+                <p class="display-6">{{ fecha_hoy }}</p>
+            </div>
+
+            <!-- Separador -->
+            <hr style="border-top: 1px solid #e84c3d;">
+
+            <!-- Horas disponibles -->
+            <div class="my-4">
+                <h4>Horas disponibles</h4>
+                <p>9:00 AM - 12:00 PM</p>
+                <p>2:00 PM - 6:00 PM</p>
+            </div>
+
+            <!-- Separador -->
+            <hr style="border-top: 1px solid #e84c3d;">
+
+            <!-- Ciudad -->
+            <div class="my-4">
+                <h4>Ciudad</h4>
+                <p>{{ ciudad }}</p>
+            </div>
+
+            <!-- Separador -->
+            <hr style="border-top: 1px solid #e84c3d;">
+
+            <!-- Dirección -->
+            <div class="my-4">
+                <h4>Dirección</h4>
+                <p>{{ direccion }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+<style>
+    /* Fondo general */
+    body {
+        background-color: #f5f5f5; /* Gris suave */
+        color: #333;
+    }
+
+    /* Barra de búsqueda */
+    input[type="text"] {
+        border-color: #d1d1d1; /* Gris claro */
+        box-shadow: none;
+    }
+
+    /* Estilos de la columna izquierda */
+    .col-1 {
+        background-color: transparent;
+        border-right: 2px solid #e84c3d; /* Línea roja */
+    }
+
+    .col-1 a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .col-1 a:hover {
+        color: #c0c0c0;
+    }
+
+    .col-1 i {
+        color: #e84c3d; /* Rojo suave */
+    }
+
+    .col-1 p {
+        color: #e84c3d; /* Rojo suave */
+    }
+
+    /* Estilos de la columna central (calendario) */
+    #calendar {
+        background-color: #fff;
+        border: 2px solid #d1d1d1;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilos de la columna derecha */
+    .col-4 {
+        background-color: #ffffff; /* Fondo blanco */
+        border-left: 2px solid #e84c3d; /* Línea roja */
+    }
+
+    .col-4 h3, .col-4 h4 {
+        color: #5a5a5a; /* Gris oscuro */
+    }
+
+    .col-4 p {
+        color: #e84c3d; /* Rojo suave */
+    }
+
+    .col-4 p.display-6 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    /* Responsividad: ajustar columnas en pantallas pequeñas */
+    @media (max-width: 768px) {
+        .col-1, .col-7, .col-4 {
+            width: 100%;
+            height: auto;
+        }
+
+        #calendar {
+            height: 400px; /* Ajustar el tamaño del calendario */
+        }
+    }
+</style>
+{% endblock %}

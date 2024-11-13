@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programar Citas</title>
+
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css" rel="stylesheet" />
+
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+        }
+
+
+        .icono-texto {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            outline: none;
+            text-decoration: none;
+            /* Elimina cualquier subrayado en el enlace */
+        }
+
+        .icono-texto a {
+            color: #D90404;
+            /* Color del enlace (rojo en este caso) */
+            text-decoration: none;
+            /* Elimina la línea debajo del texto */
+        }
+
+        .icono-texto i {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #F7F6F7;
+            border-radius: 6px;
+            transition: background-color 0.3s, color 0.3s;
+            color: #D90404;
+        }
+
+        .icono-texto.activo i {
+            background-color: #FFEEEE;
+            color: #D90404;
+        }
+
+        .icono-texto p {
+            color: #000;
+            margin: 0;
+        }
+
+        .icono-texto:hover i {
+            background-color: #FFEEEE;
+            color: #D90404;
+        }
+
+        .btn-hor {
+            height: 45% !important;
+            width: 100%;
+        }
+
+        .custom-btn {
+            background-color: #AEF2F2;
+            border: 1px solid #47DBF9;
+            border-radius: 0;
+            color: rgb(0, 0, 0);
+        }
+
+        .custom-btn:hover {
+            background-color: #0056b3;
+            border-color: #004080;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            /* Centra los botones horizontalmente */
+            gap: 10px;
+            /* Espacio entre los botones */
+        }
+
+        .custom-btn-programar,
+        .custom-btn-borrar {
+            width: 100%;
+            /* Ajusta el ancho del botón */
+            height: 50px;
+            /* Ajusta la altura del botón */
+            font-size: 18px;
+            /* Tamaño del texto */
+
+
+            border-radius: 8px;
+            /* Bordes redondeados */
+            transition: opacity 0.2s;
+            /* Transición en hover */
+        }
+
+        .custom-btn-programar {
+            background-color: #a4f0ff;
+            /* Color de fondo del botón de "Programar" */
+            color: #000;
+            /* Color del texto */
+            border: 2px solid #0CCDF8;
+            /* Borde del mismo color que el fondo */
+        }
+
+        .custom-btn-borrar {
+            background-color: #ffe5e5;
+            /* Color de fondo del botón de "Borrar" */
+            color: #000;
+            /* Color del texto */
+            border: 2px solid #F2A7A7;
+            /* Borde del mismo color que el fondo */
+        }
+
+        .custom-btn-programar:hover,
+        .custom-btn-borrar:hover {
+            opacity: 0.8;
+            /* Efecto de opacidad en hover */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid h-100 d-flex flex-column">
+        <div class="row" style="height: 15%;">
+            <div class="col-1 logo">
+                <img src="../../static/img/logo.png" alt="Logo" class="img-fluid" style="margin-top: 25%;">
+            </div>
+            <div class="col-8 d-flex justify-content-center align-items-center">
+                <div class="input-group" style="margin-top: 3%;">
+                    <span class="input-group-text"
+                        style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control rounded-start" placeholder="Buscar pacientes"
+                        aria-label="Buscar" style="background-color: #F7F6F7;">
+                </div>
+
+            </div>
+
+
+            <div class="col-2 d-flex justify-content-center align-items-center text-align-start flex-grow-1">
+
+            </div>
+
+
+        </div>
+
+        <div class="row flex-fill" style="height: 85%; text-align: center;">
+            <div class="col-1 d-flex flex-column align-items-center justify-content-around">
+                <a href="{% url 'citas' %}" class="icono-texto {% if pagina_actual == 'citas' %}activo{% endif %}">
+                    <i class="bi bi-list-task" style="font-size: 2rem;"></i>
+                    <p>Citas</p>
+                </a>
+
+                <a href="{% url 'inicio' %}" class="icono-texto {% if pagina_actual == 'programar' %}activo{% endif %}">
+                    <i class="bi bi-calendar-plus" style="font-size: 2rem;"></i>
+                    <p>Programar</p>
+                </a>
+
+                <a href="{% url 'inicio' %}" class="icono-texto {% if pagina_actual == 'pacientes' %}activo{% endif %}">
+                    <i class="bi bi-clipboard2-check" style="font-size: 2rem;"></i>
+                    <p>Pacientes</p>
+                </a>
+            </div>
+
+
+
+            <div class="col-8 inferior">
+
+            </div>
+
+
+
+            <div class="col-2 d-flex flex-column">
+                <div class="btn-hor" style="height: 35%; width: 140%; margin-left: 5%; text-align: start;">
+                    <h5 class="mb-3" style="color: #D90404; text-align: start;">Datos del paciente</h5>
+
+                    <p><strong>Cédula:</strong> <span id="cedula-text">{{ paciente.cedula }}</span></p>
+                    <p><strong>Teléfono:</strong> <span id="telefono-text">{{ paciente.telefono }}</span></p>
+                    <p><strong>Correo:</strong> <span id="correo-text">{{ paciente.correo }}</span></p>
+                    <p><strong>Ciudad y Dirección:</strong> <span id="ciudad-text">{{ paciente.ciudad }}</span>, <span
+                            id="direccion-text">{{ paciente.direccion }}</span></p>
+                    <p><strong>Edificio:</strong> <span id="edificio-text">{{ paciente.edificio }}</span></p>
+
+                    <!-- Botón para editar la información -->
+                    <div class="text-center">
+                        <button class="btn btn-warning" onclick="editarInformacion()">Editar Información</button>
+                    </div>
+
+                    <!-- Formulario de edición (inicialmente oculto) -->
+                    <div id="editar-formulario" style="display: none; margin-top: 20px;">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="cedula" class="form-label">Cédula</label>
+                                <input type="text" class="form-control" id="cedula" name="cedula"
+                                    value="{{ paciente.cedula }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" id="telefono" name="telefono"
+                                    value="{{ paciente.telefono }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="correo" class="form-label">Correo</label>
+                                <input type="email" class="form-control" id="correo" name="correo"
+                                    value="{{ paciente.correo }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="ciudad" class="form-label">Ciudad</label>
+                                <input type="text" class="form-control" id="ciudad" name="ciudad"
+                                    value="{{ paciente.ciudad }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="direccion" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="direccion" name="direccion"
+                                    value="{{ paciente.direccion }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="edificio" class="form-label">Edificio</label>
+                                <input type="text" class="form-control" id="edificio" name="edificio"
+                                    value="{{ paciente.edificio }}">
+                            </div>
+                            <button type="submit" class="btn btn-success" onclick="guardarCambios()">Guardar
+                                Cambios</button>
+                            <button type="button" class="btn btn-secondary"
+                                onclick="cancelarEdicion()">Cancelar</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Nota del paciente -->
+                <div id="nota-paciente" class="btn-hor" style="height: 40%; width: 140%; margin-left: 5%;">
+                    <h5 class="mb-3" style="color: #D90404; text-align: start;">Nota del paciente</h5>
+                </div>
+
+                <!-- Botones para ver y cargar archivos -->
+                <div id="archivos-container" class="container text-center mt-5" style="margin-left: 5%; width: 140%;">
+                    <div class="mb-3 button-container">
+                        <button type="button" class="btn btn-primary custom-btn-programar">Ver archivos</button>
+                        <button type="button" class="btn btn-danger custom-btn-borrar">Cargar archivos</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function editarInformacion() {
+            document.getElementById("editar-formulario").style.display = "block";
+            document.getElementById("nota-paciente").style.display = "none";
+            document.getElementById("archivos-container").style.display = "none";
+        }
+
+        function cancelarEdicion() {
+            document.getElementById("editar-formulario").style.display = "none";
+            document.getElementById("nota-paciente").style.display = "block";
+            document.getElementById("archivos-container").style.display = "block";
+        }
+
+        function guardarCambios() {
+            // Aquí puedes agregar lógica para manejar el guardado, si es necesario.
+            cancelarEdicion();
+        }
+    </script>
+
+
+
+</body>
+
+</html>
