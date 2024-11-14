@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opciones</title>
+    <style>
+        /* Estilos básicos */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #FFEEEE; /* Fondo de la página */
+        }
+
+        .contenedor {
+            text-align: center;
+        }
+
+        .opcion {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            background-color: #D90404; /* Color de fondo del botón */
+            color: #FFEEEE; /* Color del texto */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Efecto al pasar el cursor */
+        .opcion:hover {
+            background-color: #FFEEEE; /* Fondo cambia cuando se pasa el cursor */
+            color: #D90404; /* Color del texto cambia */
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <button class="opcion" onclick="window.location.href='/citas'">Citas</button>
+        <button class="opcion" onclick="window.location.href='/citas/programar'">Programar</button>
+        <button class="opcion" onclick="window.location.href='/pacientes'">Pacientes</button>
+    </div>
+</body>
+</html>

@@ -276,6 +276,8 @@
 </head>
 
 <body>
+
+
     <div class="container-fluid h-100 d-flex flex-column">
         <div class="row" style="height: 15%;">
             <div class="col-1 logo">
@@ -308,7 +310,8 @@
                     <p>Citas</p>
                 </a>
 
-                <a href="{% url 'programar_cita' %}" class="icono-texto {% if pagina_actual == 'programar' %}activo{% endif %}">
+                <a href="{% url 'programar_cita' %}"
+                    class="icono-texto {% if pagina_actual == 'programar' %}activo{% endif %}">
                     <i class="bi bi-calendar-plus" style="font-size: 2rem;"></i>
                     <p>Programar</p>
                 </a>
@@ -433,7 +436,6 @@
         </div>
     </div>
 
-
     <script>
 
 
@@ -446,27 +448,23 @@
                 locale: 'es',
                 headerToolbar: { left: 'prev', center: 'title', right: 'next' },
                 dateClick: info => {
-                    // Obtener la fecha completa en la zona horaria local
                     const clickedDate = new Date(info.date);
+                    const localDateStr = clickedDate.toISOString().split('T')[0];
 
-                    // Convertirla al formato 'YYYY-MM-DD' en la zona horaria local
-                    const localDateStr = clickedDate.toLocaleDateString('en-GB');  // Usa 'en-GB' para 'DD/MM/YYYY'
+                    console.log("Fecha clickeada:", localDateStr);
 
-                    // Verificar si la fecha ya está seleccionada
                     if (selectedDates.includes(localDateStr)) {
-                        // Si está seleccionada, eliminarla del array y actualizar la visualización
                         selectedDates.splice(selectedDates.indexOf(localDateStr), 1);
-                        info.dayEl.classList.remove('selected'); // Remover el estilo
+                        info.dayEl.classList.remove('selected');
+                        console.log("Fecha deseleccionada:", localDateStr);
                     } else {
-                        // Si no está seleccionada, agregarla al array
                         selectedDates.push(localDateStr);
-                        info.dayEl.classList.add('selected'); // Agregar el estilo
+                        info.dayEl.classList.add('selected');
+                        console.log("Fecha seleccionada:", localDateStr);
                     }
 
-                    // Actualizar las fechas seleccionadas y mostrarlas
                     updateSelectedDatesDisplay();
                 },
-
 
                 events: [], // Sin eventos predefinidos
                 eventColor: '#378006',
@@ -501,26 +499,43 @@
                 const formattedCurrentDay = currentDay.toLocaleDateString('es-ES', options);
                 const capitalizedCurrentDay = formattedCurrentDay.charAt(0).toUpperCase() + formattedCurrentDay.slice(1);
 
-                // Mostrar el día actual si no hay fechas seleccionadas
+                // Verificar el estado de selectedDates
+                console.log("Fechas seleccionadas:", selectedDates);
+
+                // Si no hay fechas seleccionadas, mostrar el día actual
                 if (selectedDates.length === 0) {
-                    selectedDatesContainer.innerText = capitalizedCurrentDay; // Mostrar el día actual
+                    selectedDatesContainer.innerText = capitalizedCurrentDay;
+                    console.log("Mostrando el día actual:", capitalizedCurrentDay);
                     return;
                 }
 
                 // Ordenar las fechas seleccionadas
                 selectedDates.sort((a, b) => new Date(a) - new Date(b));
 
+                // Verificar cómo se ordenaron las fechas
+                console.log("Fechas ordenadas:", selectedDates);
+
                 // Obtener la menor y mayor fecha
                 const start = new Date(selectedDates[0]);
                 const end = new Date(selectedDates[selectedDates.length - 1]);
 
+                // Ajustar las fechas para eliminar el desfase de un día en función de la zona horaria local
+                const localStart = new Date(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
+                const localEnd = new Date(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate());
+
+                // Verificar las fechas ajustadas
+                console.log("Fecha de inicio ajustada:", localStart);
+                console.log("Fecha de fin ajustada:", localEnd);
+
                 // Obtener el día y el número de la fecha
-                const startFormatted = start.toLocaleDateString('es-ES', options).replace(/^./, c => c.toUpperCase());
-                const endFormatted = end.toLocaleDateString('es-ES', options).replace(/^./, c => c.toUpperCase());
+                const options1 = { weekday: 'long', day: 'numeric' };
+                const startFormatted = localStart.toLocaleDateString('es-ES', options1).replace(/^./, c => c.toUpperCase());
+                const endFormatted = localEnd.toLocaleDateString('es-ES', options1).replace(/^./, c => c.toUpperCase());
 
                 // Mostrar las fechas seleccionadas
                 selectedDatesContainer.innerText =
                     selectedDates.length === 1 ? startFormatted : `${startFormatted} - ${endFormatted}`;
+                console.log("Mostrando fechas seleccionadas:", selectedDatesContainer.innerText);
             };
 
             // Llamar a la función para mostrar el día actual al cargar la página
@@ -528,6 +543,9 @@
         });
 
     </script>
+
+
+
     </div>
 </body>
 

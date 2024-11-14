@@ -5,6 +5,15 @@ from datetime import datetime
 import json
 
 
+# Vista para ver historial de citas
+def citas(request):
+    # Filtra las citas del usuario actual
+    citas = Cita.objects.filter(usuario=request.user).order_by('-fecha', '-hora')
+
+    return render(request, 'citas/citas.html', {'citas': citas, 'pagina_actual': 'citas'})
+
+
+
 # Vista para la página principal (calendario del médico)
 def inicio(request):
     # Obtener todas las citas de hoy
@@ -44,16 +53,10 @@ def programar_cita(request):
     # Obtener todas las ciudades
     ciudades = Ciudad.objects.all()
 
-    return render(request, 'citas/inicio.html', {
+    return render(request, 'citas/programar.html', {
         'citas_json': citas_json,
         'ciudades': ciudades,
         'pagina_actual': 'programar'
     })
 
 
-# Vista para ver historial de citas
-def citas(request):
-    # Filtra las citas del usuario actual
-    citas = Cita.objects.filter(usuario=request.user).order_by('-fecha', '-hora')
-
-    return render(request, 'citas/citas.html', {'citas': citas, 'pagina_actual': 'citas'})
