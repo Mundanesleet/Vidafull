@@ -14,6 +14,15 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
+    <!-- Incluir CSS de Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- Incluir JS de Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+    <script src="{% static 'js/calendario.js' %}" defer></script>
+
     <style>
         body,
         html {
@@ -76,7 +85,19 @@
 
         .fc-toolbar-title {
             color: #D90404;
+            text-transform: capitalize;
         }
+
+        .fc-col-header-cell-cushion {
+            color: #000000 !important;
+            /* Forzar el cambio de color */
+            font-weight: bold !important;
+            /* Forzar el cambio de peso de la fuente */
+            text-transform: capitalize !important;
+            /* Asegurarse de que la primera letra sea mayúscula */
+            text-decoration: none;
+        }
+
 
         .fc-button {
             border-radius: 100px !important;
@@ -107,7 +128,7 @@
 
         /* Cambiar color del número del día */
         .fc-daygrid-day-number {
-            color: #D90404;
+            color: #D90404 !important;
             /* Cambia esto al color que quieras */
             font-weight: bold;
             /* Opcional: darle peso al texto */
@@ -208,22 +229,33 @@
             width: 100%;
         }
 
+
         .custom-btn {
-            background-color: #AEF2F2;
-            border: 1px solid #47DBF9;
+            background-color: #FFEEEE;
+            border: 1px solid #F2A7A7;
             border-radius: 0;
             color: rgb(0, 0, 0);
         }
 
         .custom-btn:hover {
-            background-color: #0056b3;
-            border-color: #004080;
+            background-color: #a0a0a0;
+            /* Mantiene el fondo original */
+            color: rgb(0, 0, 0);
+            /* Mantiene el color del texto original */
+            border: 1px solid #a0a0a0;
+            /* Mantiene el color del borde original */
+            cursor: default;
+            /* Opcional: cambia el cursor para indicar que no es interactivo */
         }
 
 
-
-
-
+        .hora-seleccionada {
+            background-color: #d3d3d3;
+            /* Gris claro para indicar no disponibilidad */
+            color: #a0a0a0;
+            /* Color del texto gris para que parezca desactivado */
+            border: 1px solid #a0a0a0;
+        }
 
         .button-container {
             display: flex;
@@ -241,31 +273,18 @@
             /* Ajusta la altura del botón */
             font-size: 18px;
             /* Tamaño del texto */
-
-
+            border: 2px solid #a0a0a0;
+            /* Borde del mismo color que el fondo */
+            background-color: #d3d3d3;
+            /* Color de fondo */
+            color: #000;
+            /* Color del texto */
             border-radius: 8px;
             /* Bordes redondeados */
             transition: opacity 0.2s;
             /* Transición en hover */
         }
 
-        .custom-btn-programar {
-            background-color: #a4f0ff;
-            /* Color de fondo del botón de "Programar" */
-            color: #000;
-            /* Color del texto */
-            border: 2px solid #0CCDF8;
-            /* Borde del mismo color que el fondo */
-        }
-
-        .custom-btn-borrar {
-            background-color: #ffe5e5;
-            /* Color de fondo del botón de "Borrar" */
-            color: #000;
-            /* Color del texto */
-            border: 2px solid #F2A7A7;
-            /* Borde del mismo color que el fondo */
-        }
 
         .custom-btn-programar:hover,
         .custom-btn-borrar:hover {
@@ -289,7 +308,7 @@
                         style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" class="form-control rounded-start" placeholder="Buscar fechas"
+                    <input type="text" id="fecha" class="form-control rounded-start" placeholder="Buscar fechas"
                         aria-label="Buscar" style="background-color: #F7F6F7;">
                 </div>
 
@@ -434,118 +453,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <script>
-
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const selectedDates = []; // Inicializar el array de fechas seleccionadas
-            const today = new Date(); // Obtener la fecha actual
-
-            const calendario = new FullCalendar.Calendar(document.getElementById('calendario'), {
-                initialView: 'dayGridMonth',
-                locale: 'es',
-                headerToolbar: { left: 'prev', center: 'title', right: 'next' },
-                dateClick: info => {
-                    const clickedDate = new Date(info.date);
-                    const localDateStr = clickedDate.toISOString().split('T')[0];
-
-                    console.log("Fecha clickeada:", localDateStr);
-
-                    if (selectedDates.includes(localDateStr)) {
-                        selectedDates.splice(selectedDates.indexOf(localDateStr), 1);
-                        info.dayEl.classList.remove('selected');
-                        console.log("Fecha deseleccionada:", localDateStr);
-                    } else {
-                        selectedDates.push(localDateStr);
-                        info.dayEl.classList.add('selected');
-                        console.log("Fecha seleccionada:", localDateStr);
-                    }
-
-                    updateSelectedDatesDisplay();
-                },
-
-                events: [], // Sin eventos predefinidos
-                eventColor: '#378006',
-                dayCellDidMount: info => {
-                    // Marcar días seleccionados
-                    if (selectedDates.includes(info.dateStr)) {
-                        info.el.classList.add('selected'); // Agregar la clase de estilo
-                    }
-
-                    // Obtener el número del día directamente desde info.date
-                    const dayNumber = info.date.getDate(); // Obtener el día del mes (1-31)
-
-                    // Formatear el día para que tenga un 0 delante si es menor que 10
-                    const formattedDayNumber = dayNumber < 10 ? `0${dayNumber}` : dayNumber;
-
-                    // Cambiar el texto del día en el elemento correspondiente solo si está vacío
-                    if (!info.el.innerText) {
-                        info.el.innerText = formattedDayNumber; // Cambiar el texto del día a solo el número formateado
-                    }
-                }
-            });
-
-            calendario.render();
-            calendario.gotoDate(today); // Establecer la fecha predeterminada en el calendario
-
-            const updateSelectedDatesDisplay = () => {
-                const selectedDatesContainer = document.getElementById('selectedDates');
-
-                // Mostrar el día actual al cargar la página
-                const currentDay = new Date();
-                const options = { weekday: 'long', day: 'numeric' };
-                const formattedCurrentDay = currentDay.toLocaleDateString('es-ES', options);
-                const capitalizedCurrentDay = formattedCurrentDay.charAt(0).toUpperCase() + formattedCurrentDay.slice(1);
-
-                // Verificar el estado de selectedDates
-                console.log("Fechas seleccionadas:", selectedDates);
-
-                // Si no hay fechas seleccionadas, mostrar el día actual
-                if (selectedDates.length === 0) {
-                    selectedDatesContainer.innerText = capitalizedCurrentDay;
-                    console.log("Mostrando el día actual:", capitalizedCurrentDay);
-                    return;
-                }
-
-                // Ordenar las fechas seleccionadas
-                selectedDates.sort((a, b) => new Date(a) - new Date(b));
-
-                // Verificar cómo se ordenaron las fechas
-                console.log("Fechas ordenadas:", selectedDates);
-
-                // Obtener la menor y mayor fecha
-                const start = new Date(selectedDates[0]);
-                const end = new Date(selectedDates[selectedDates.length - 1]);
-
-                // Ajustar las fechas para eliminar el desfase de un día en función de la zona horaria local
-                const localStart = new Date(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
-                const localEnd = new Date(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate());
-
-                // Verificar las fechas ajustadas
-                console.log("Fecha de inicio ajustada:", localStart);
-                console.log("Fecha de fin ajustada:", localEnd);
-
-                // Obtener el día y el número de la fecha
-                const options1 = { weekday: 'long', day: 'numeric' };
-                const startFormatted = localStart.toLocaleDateString('es-ES', options1).replace(/^./, c => c.toUpperCase());
-                const endFormatted = localEnd.toLocaleDateString('es-ES', options1).replace(/^./, c => c.toUpperCase());
-
-                // Mostrar las fechas seleccionadas
-                selectedDatesContainer.innerText =
-                    selectedDates.length === 1 ? startFormatted : `${startFormatted} - ${endFormatted}`;
-                console.log("Mostrando fechas seleccionadas:", selectedDatesContainer.innerText);
-            };
-
-            // Llamar a la función para mostrar el día actual al cargar la página
-            updateSelectedDatesDisplay();
-        });
-
-    </script>
-
-
-
     </div>
 </body>
 
