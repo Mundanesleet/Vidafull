@@ -3,59 +3,55 @@ from django.utils import timezone
 from datetime import datetime
 from django.contrib.auth.models import User
 
-class Ciudad(models.Model):
+
+
+class Ciudades_disponibles(models.Model):
     nombre = models.CharField(max_length=100)
+
+    # class Meta:
+    #     db_table = 'citas_ciudad'
 
     def __str__(self):
         return self.nombre
+
+class Direccion(models.Model):
+    direccion = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.direccion
 
 class Especialista(models.Model):
     nombre = models.CharField(max_length=100)
     especialidad = models.CharField(max_length=100)
-    ciudades = models.ManyToManyField(Ciudad, related_name='especialistas')
+    ciudades = models.ManyToManyField(Ciudades_disponibles, related_name='especialistas')
 
     def __str__(self):
         return self.nombre
-
+    
 class Disponibilidad(models.Model):
-    especialista = models.ForeignKey(Especialista, on_delete=models.CASCADE, related_name='disponibilidades')
-    fecha = models.DateField()
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
-    ciudad = models.ForeignKey(Ciudad, on_delete=models.CASCADE)
+    dia = models.DateField()  # Día específico de disponibilidad
+    hora_inicio = models.TimeField()  # Hora de inicio de disponibilidad
+    hora_fin = models.TimeField()  # Hora de fin de disponibilidad
+    ciudad = models.CharField(max_length=100)  # Ciudad donde estará disponible
+    direccion = models.CharField(max_length=255)  # Dirección exacta
 
     def __str__(self):
-        return f"{self.especialista} disponible en {self.ciudad} el {self.fecha} de {self.hora_inicio} a {self.hora_fin}"
-
-class Paciente(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
-    nombre = models.CharField(max_length=100)
-    identificacion = models.CharField(max_length=50, unique=True)
-    fecha_nacimiento = models.DateField()
-    telefono = models.CharField(max_length=20, blank=True)
-    correo = models.EmailField(max_length=100, blank=True)
-    ciudad = models.CharField(max_length=100, blank=True)
-    direccion = models.CharField(max_length=255, blank=True)
-    edificio = models.CharField(max_length=100, blank=True)
-
-    def __str__(self):
-        return self.nombre
+        return f"Disponibilidad el {self.dia} de {self.hora_inicio} a {self.hora_fin} en {self.ciudad}, {self.direccion}"
+    
+    
 
 class Cita(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True)  # Agregar campo a User
-    fecha = models.DateField(default=timezone.now)
-    hora = models.TimeField(null=True, blank=True)
-    motivo = models.CharField(max_length=255)
+    from pacientes.models import Paciente
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
-    disponibilidad = models.ForeignKey(Disponibilidad, on_delete=models.CASCADE, null=True, blank=True)
-    detalles = models.TextField(blank=True, null=True)
-
+    fecha = models.DateField(default=timezone.now)  # Fecha específica de la cita
+    hora = models.TimeField(null=True, blank=True)  # Hora específica de la cita
+    disponibilidad = models.ForeignKey(Disponibilidad, on_delete=models.CASCADE)  # Referencia a disponibilidad
     
 
     def fecha_hora(self):
-        if self.hora is not None:
-            return datetime.combine(self.fecha, self.hora)
+        if self.hora:
+            return timezone.datetime.combine(self.fecha, self.hora)
         return None
 
     def __str__(self):
-        return f"Cita de {self.paciente} con {self.disponibilidad.especialista} el {self.fecha} a las {self.hora}"
+        return f"Cita de {self.paciente} el {self.fecha} a las {self.hora} en {self.disponibilidad.ciudad}, {self.disponibilidad.direccion}"

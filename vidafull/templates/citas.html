@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+    {% block content %}
+
+    <body>
+        <div class="container-fluid h-100 d-flex flex-column">
+            <div class="row" style="height: 15%;">
+                <div class="col-1 logo">
+                    <img src="../../static/img/logo.png" alt="Logo" class="img-fluid" style="margin-top: 25%;">
+                </div>
+                <div class="col-8 d-flex justify-content-center align-items-center">
+                    <div class="input-group" style="margin-top: 3%;">
+                        <span class="input-group-text"
+                            style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control rounded-start" placeholder="Buscar pacientes"
+                            aria-label="Buscar" style="background-color: #F7F6F7;">
+                    </div>
+
+                </div>
+
+
+                <div class="col-2 d-flex justify-content-center align-items-center text-align-start flex-grow-1">
+
+                </div>
+
+
+            </div>
+
+            <div class="row flex-fill" style="height: 85%; text-align: center;">
+                <div class="col-1 d-flex flex-column align-items-center justify-content-around">
+                    <a href="{% url 'citas' %}" class="icono-texto {% if pagina_actual == 'citas' %}activo{% endif %}">
+                        <i class="bi bi-list-task" style="font-size: 2rem;"></i>
+                        <p>Citas</p>
+                    </a>
+    
+                    <a href="{% url 'programar_cita' %}"
+                        class="icono-texto {% if pagina_actual == 'programar' %}activo{% endif %}">
+                        <i class="bi bi-calendar-plus" style="font-size: 2rem;"></i>
+                        <p>Programar</p>
+                    </a>
+    
+                    <a href="{% url 'inicio' %}" class="icono-texto {% if pagina_actual == 'pacientes' %}activo{% endif %}">
+                        <i class="bi bi-clipboard2-check" style="font-size: 2rem;"></i>
+                        <p>Pacientes</p>
+                    </a>
+                </div>
+
+
+
+                <div class="col-8 inferior">
+
+                </div>
+
+
+
+                <div class="col-2 d-flex flex-column">
+                    <div class="btn-hor" style="height: 35%; width: 140%; margin-left: 5%; text-align: start;">
+                        <h5 class="mb-3" style="color: #D90404; text-align: start;">Datos del paciente</h5>
+
+                        <p><strong>Cédula:</strong> <span id="cedula-text">{{ paciente.cedula }}</span></p>
+                        <p><strong>Teléfono:</strong> <span id="telefono-text">{{ paciente.telefono }}</span></p>
+                        <p><strong>Correo:</strong> <span id="correo-text">{{ paciente.correo }}</span></p>
+                        <p><strong>Ciudad y Dirección:</strong> <span id="ciudad-text">{{ paciente.ciudad }}</span>, <span
+                                id="direccion-text">{{ paciente.direccion }}</span></p>
+                        <p><strong>Edificio:</strong> <span id="edificio-text">{{ paciente.edificio }}</span></p>
+
+                        <!-- Botón para editar la información -->
+                        <div class="text-center">
+                            <button class="btn btn-warning" onclick="editarInformacion()">Editar Información</button>
+                        </div>
+
+                        <!-- Formulario de edición (inicialmente oculto) -->
+                        <div id="editar-formulario" style="display: none; margin-top: 20px;">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="cedula" class="form-label">Cédula</label>
+                                    <input type="text" class="form-control" id="cedula" name="cedula"
+                                        value="{{ paciente.cedula }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control" id="telefono" name="telefono"
+                                        value="{{ paciente.telefono }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="correo" class="form-label">Correo</label>
+                                    <input type="email" class="form-control" id="correo" name="correo"
+                                        value="{{ paciente.correo }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="ciudad" class="form-label">Ciudad</label>
+                                    <input type="text" class="form-control" id="ciudad" name="ciudad"
+                                        value="{{ paciente.ciudad }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="direccion" class="form-label">Dirección</label>
+                                    <input type="text" class="form-control" id="direccion" name="direccion"
+                                        value="{{ paciente.direccion }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edificio" class="form-label">Edificio</label>
+                                    <input type="text" class="form-control" id="edificio" name="edificio"
+                                        value="{{ paciente.edificio }}">
+                                </div>
+                                <button type="submit" class="btn btn-success" onclick="guardarCambios()">Guardar
+                                    Cambios</button>
+                                <button type="button" class="btn btn-secondary"
+                                    onclick="cancelarEdicion()">Cancelar</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Nota del paciente -->
+                    <div id="nota-paciente" class="btn-hor" style="height: 40%; width: 140%; margin-left: 5%;">
+                        <h5 class="mb-3" style="color: #D90404; text-align: start;">Nota del paciente</h5>
+                    </div>
+
+                    <!-- Botones para ver y cargar archivos -->
+                    <div id="archivos-container" class="container text-center mt-5" style="margin-left: 5%; width: 140%;">
+                        <div class="mb-3 button-container">
+                            <button type="button" class="btn btn-primary custom-btn-programar">Ver archivos</button>
+                            <button type="button" class="btn btn-danger custom-btn-borrar">Cargar archivos</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    {% endblock %}
+
+    {% block script %}
+        <script>
+            function editarInformacion() {
+                document.getElementById("editar-formulario").style.display = "block";
+                document.getElementById("nota-paciente").style.display = "none";
+                document.getElementById("archivos-container").style.display = "none";
+            }
+
+            function cancelarEdicion() {
+                document.getElementById("editar-formulario").style.display = "none";
+                document.getElementById("nota-paciente").style.display = "block";
+                document.getElementById("archivos-container").style.display = "block";
+            }
+
+            function guardarCambios() {
+                // Aquí puedes agregar lógica para manejar el guardado, si es necesario.
+                cancelarEdicion();
+            }
+        </script>
+    {% endblock %}

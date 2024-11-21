@@ -122,22 +122,3 @@ document.addEventListener('DOMContentLoaded', function () {
     // Llamar a la función para mostrar el día actual al cargar la página
     updateSelectedDatesDisplay();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
