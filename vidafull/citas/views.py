@@ -5,7 +5,25 @@ from django.contrib import messages
 from datetime import datetime
 from django.http import JsonResponse
 from .serializers import DireccionSerializer
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
+from .models import Paciente, Archivo
+
+@csrf_exempt
+def cargar_archivos(request, paciente_id):
+    paciente = get_object_or_404(Paciente, pk=paciente_id)
+
+    if request.method == 'POST' and request.FILES.get('archivo'):
+        archivo = request.FILES['archivo']
+        
+        # Guardar el archivo en el modelo Archivo
+        nuevo_archivo = Archivo(paciente=paciente, archivo=archivo)
+        nuevo_archivo.save()
+        
+        return JsonResponse({'success': True, 'message': 'Archivo cargado correctamente'})
+    
+    return JsonResponse({'success': False, 'message': 'No se recibió un archivo válido'}, status=400)
 
 
 def obtener_horas_disponibles(request):
@@ -16,19 +34,44 @@ def obtener_horas_disponibles(request):
         horas_ocupadas = list(citas_ocupadas)  # Convertir a lista para JSON
 
         # Opcional: Lista de todas las horas (ajústalo según tu rango de horas)
-        todas_las_horas = [f"{hora}:00" for hora in range(8, 18)]  # Ejemplo de 8 am a 5 pm
+        todas_las_horas = [f"{hora}:00" for hora in range(7, 20)]  
         horas_disponibles = [hora for hora in todas_las_horas if hora not in horas_ocupadas]
 
         return JsonResponse({"horas_ocupadas": horas_ocupadas, "horas_disponibles": horas_disponibles})
     return JsonResponse({"error": "Fecha no proporcionada"}, status=400)
 
 
-# Vista para ver historial de citas
-def citas(request):
-    # Filtra las citas del usuario actual
-    citas = Cita.objects.filter(usuario=request.user).order_by('-fecha', '-hora')
+def lista_pacientes(request):
+    pacientes = Paciente.objects.all()
+    print(pacientes)
+    return render(request, 'pacientes.html', {'pacientes': pacientes, 'pagina_actual': 'pacientes',})
 
-    return render(request, 'citas.html', {'citas': citas, 'pagina_actual': 'citas'})
+def citas(request):
+    # Obtener la fecha actual
+    
+    fecha_actual = timezone.now().date()
+
+    # Si el usuario quiere ver citas de otro día
+    if 'fecha' in request.GET:
+        fecha_actual = request.GET['fecha']
+
+    # Consultar citas del día
+    citas_del_dia = Cita.objects.all().order_by('hora')
+    print(citas_del_dia)
+
+    # Obtener el mes para mostrar
+    mes = fecha_actual.strftime("%B")
+
+    context = {
+        'fecha_actual': fecha_actual,
+        'citas_del_dia': citas_del_dia,
+        'mes': mes,
+        'pagina_actual': 'citas',
+    }
+
+    return render(request, 'citas.html', context)
+
+    
 
 
 # Vista para la página principal (calendario del médico)
@@ -70,7 +113,7 @@ def programar_cita(request):
         horas_ocupadas = [cita.hora.hour for cita in citas if cita.hora]
 
         # Obtener las horas disponibles (por ejemplo, de 7 AM a 6 PM)
-        horas_disponibles = [hora for hora in range(7, 19) if hora not in horas_ocupadas and hora not in horas_seleccionadas]
+        horas_disponibles = [hora for hora in range(7, 20) if hora not in horas_ocupadas and hora not in horas_seleccionadas]
 
         # Guardar la disponibilidad en la base de datos
         try:

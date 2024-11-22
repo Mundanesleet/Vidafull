@@ -34,6 +34,182 @@
             padding: 0px;
         }
 
+        /* Contenedor principal */
+
+        .col-9 {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Cambiar 'center' a 'flex-start' para alinear hacia arriba */
+            flex-direction: column;
+            padding-top: 20px;
+            /* Añadir algo de espacio en la parte superior si es necesario */
+        }
+
+        /* Contenedor de fecha y botones */
+        .fecha-navegacion {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            /* Permite que los botones se ubiquen correctamente */
+        }
+
+        /* Contenedor de la fecha y mes */
+        .fecha-info {
+            text-align: center;
+        }
+
+        /* Estilo de la fecha actual */
+        .fecha-actual {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* Estilo del mes y día */
+        .mes {
+            font-size: 30px;
+        }
+
+        /* Estilo de los botones de navegación */
+        .navegacion {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-navegar {
+            background-color: #D90404;
+            color: white;
+            border: none;
+            padding: 10px;
+            /* Hacer el padding igual en ambos lados para mayor consistencia */
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 50%;
+            /* Esto hace que el botón sea redondo */
+            transition: background-color 0.3s;
+            width: 40px;
+            /* Establecer un ancho fijo */
+            height: 40px;
+            /* Establecer una altura fija */
+            display: flex;
+            justify-content: center;
+            /* Centrar el contenido (la flecha) */
+            align-items: center;
+            /* Centrar el contenido (la flecha) */
+            margin: 10px;
+        }
+
+        .btn-navegar:hover {
+            background-color: #db7171;
+        }
+
+        /* Dia actual */
+        .dia-nombre {
+            font-size: 30px;
+            text-align: center;
+            margin: 20px;
+            color: #D90404;
+            font-weight: 500;
+        }
+
+        /* Citas del día */
+        .citas-del-dia {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100% !important;
+
+        }
+
+        .cita-card {
+            margin-bottom: 0.8rem; /* Espacio entre cada cita */
+            display: flex;
+            background-color: #fff5f5;
+            border: 1px solid #f8c8c8;
+            border-radius: 10px;
+            padding: 10px;
+            gap: 1rem;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .cita-hora {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #333;
+            padding-top: 12px;
+            width: 120px;
+            text-align: center;
+            white-space: nowrap; 
+        }
+
+        .cita-info {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .cita-paciente,
+        .cita-nota {
+            flex: 1;
+        }
+
+        .cita-paciente {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .paciente-icono {
+            font-size: 2em;
+            color: red;
+        }
+
+        .paciente-datos .nombre {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #cc0000;
+        }
+
+        .paciente-datos .edad {
+            color: #555;
+        }
+
+        .cita-nota {
+            border-left: 1px solid #f8c8c8;
+            padding-left: 1rem;
+        }
+
+        .nota-titulo {
+            font-weight: bold;
+            color: #cc0000;
+        }
+
+        .nota-texto {
+            color: #333;
+            font-size: 0.9em;
+            text-align: start;
+        }
+
+
+
+        .editar-info {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 20px;
+            /* Tamaño del texto */
+            border: 2px solid #a0a0a0;
+            /* Borde del mismo color que el fondo */
+            background-color: #d3d3d3;
+            /* Color de fondo */
+            color: #000;
+            border-radius: 8px;
+
+        }
+
         .toast-message {
             position: fixed;
             top: 50%;
@@ -84,10 +260,11 @@
             justify-content: center;
             background: none;
             border: none;
-            padding: 10px;
+            padding: 20px;
             cursor: pointer;
             outline: none;
             text-decoration: none;
+            margin-bottom: 160px;
             /* Elimina cualquier subrayado en el enlace */
         }
 
@@ -340,14 +517,60 @@
     </style>
 </head>
 
+
+
 <body>
-    <div class="">
-        {% block content %}
 
-        {% endblock %}
+
+    <div class="container-fluid">
+        <!-- Logo y Barra de Búsqueda -->
+        <div class="row" style="height: 15%;">
+            <div class="col-1 logo">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" class="img-fluid" style="margin-top: 25%;">
+            </div>
+            <div class="col-8 d-flex justify-content-center align-items-center">
+                <div class="input-group" style="margin-top: 3%;">
+                    <span class="input-group-text"
+                        style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="fecha" name="fecha" class="form-control rounded-start"
+                        placeholder="Buscar fechas" aria-label="Buscar" style="background-color: #F7F6F7;">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Barra lateral de navegación -->
+            <div class="col-2 col-md-1 d-flex flex-column align-items-start justify-content-start bg-light vh-100">
+                <a href="{% url 'citas' %}" class="icono-texto {% if pagina_actual == 'citas' %}activo{% endif %} mb-7">
+                    <i class="bi bi-list-task" style="font-size: 2rem;"></i>
+                    <p>Citas</p>
+                </a>
+                <a href="{% url 'programar_cita' %}"
+                    class="icono-texto {% if pagina_actual == 'programar' %}activo{% endif %} mb-7">
+                    <i class="bi bi-calendar-plus" style="font-size: 2rem;"></i>
+                    <p>Programar</p>
+                </a>
+                <a href="{% url 'lista_pacientes' %}"
+                    class="icono-texto {% if pagina_actual == 'pacientes' %}activo{% endif %} mb-7">
+                    <i class="bi bi-clipboard2-check" style="font-size: 2rem;"></i>
+                    <p>Pacientes</p>
+                </a>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="col">
+                {% block content %}
+                <!-- Aquí irá el contenido específico de cada página -->
+                {% endblock %}
+            </div>
+        </div>
+
     </div>
-    {% block script %}
 
+    {% block script %}
+    <!-- Scripts adicionales -->
     {% endblock %}
 
 </body>

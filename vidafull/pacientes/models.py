@@ -8,7 +8,7 @@ from django.db import models
 
 class Paciente(models.Model):
     from citas.models import Ciudades_disponibles
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='pacientes')
     nombre = models.CharField(max_length=100)
     identificacion = models.CharField(max_length=50, unique=True)
     fecha_nacimiento = models.DateField()

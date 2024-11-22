@@ -1,153 +1,267 @@
 {% extends "base.html" %}
 
-    {% block content %}
+{% block content %}
 
-    <body>
-        <div class="container-fluid h-100 d-flex flex-column">
-            <div class="row" style="height: 15%;">
-                <div class="col-1 logo">
-                    <img src="../../static/img/logo.png" alt="Logo" class="img-fluid" style="margin-top: 25%;">
-                </div>
-                <div class="col-8 d-flex justify-content-center align-items-center">
-                    <div class="input-group" style="margin-top: 3%;">
-                        <span class="input-group-text"
-                            style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" class="form-control rounded-start" placeholder="Buscar pacientes"
-                            aria-label="Buscar" style="background-color: #F7F6F7;">
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sección principal de contenido -->
+            <div class="col-9 d-flex align-items-center justify-content-start">
+
+                <div class="fecha-navegacion">
+                    <div class="fecha-info">
+                        <p class="mes">{{ mes }}</p>
                     </div>
 
+                    <div class="navegacion">
+                        <p class="dia-nombre">{{ fecha_actual|date:"l d" }}</p>
+                        <button class="btn-navegar" id="anterior" onclick="cambiarFecha(-1)"><i
+                                class="fas fa-chevron-left"></i></button>
+                        <button class="btn-navegar" id="siguiente" onclick="cambiarFecha(1)"><i
+                                class="fas fa-chevron-right"></i></button>
+                    </div>
                 </div>
 
-
-                <div class="col-2 d-flex justify-content-center align-items-center text-align-start flex-grow-1">
-
+                <div class="citas-del-dia">
+                    <div>
+                        {% for cita in citas_del_dia %}
+                        <div class="cita-card" data-cedula="{{ cita.paciente.cedula }}"
+                            data-telefono="{{ cita.paciente.telefono }}" data-correo="{{ cita.paciente.correo }}"
+                            data-ciudad="{{ cita.paciente.ciudad }}" data-edificio="{{ cita.paciente.edificio }}"
+                            data-nota="{{ cita.nota }}" onclick="mostrarDetalles(this)">
+                            <div class="cita-hora">
+                                <p>{{ cita.hora|date:"h:i a" }}</p>
+                            </div>
+                            <div class="cita-info">
+                                <div class="cita-paciente">
+                                    <div class="paciente-icono">
+                                        <span>👤</span>
+                                    </div>
+                                    <div class="paciente-datos">
+                                        <p class="nombre">{{ cita.paciente.nombre }}</p>
+                                        <p class="edad">Edad {{ cita.paciente.edad }} años</p>
+                                    </div>
+                                </div>
+                                <div class="cita-nota">
+                                    <p class="nota-titulo">Nota del paciente</p>
+                                    <p class="nota-texto">{{ cita.paciente.nota }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No hay citas para este día.</p>
+                        {% endfor %}
+                    </div>
                 </div>
+
 
 
             </div>
 
-            <div class="row flex-fill" style="height: 85%; text-align: center;">
-                <div class="col-1 d-flex flex-column align-items-center justify-content-around">
-                    <a href="{% url 'citas' %}" class="icono-texto {% if pagina_actual == 'citas' %}activo{% endif %}">
-                        <i class="bi bi-list-task" style="font-size: 2rem;"></i>
-                        <p>Citas</p>
-                    </a>
-    
-                    <a href="{% url 'programar_cita' %}"
-                        class="icono-texto {% if pagina_actual == 'programar' %}activo{% endif %}">
-                        <i class="bi bi-calendar-plus" style="font-size: 2rem;"></i>
-                        <p>Programar</p>
-                    </a>
-    
-                    <a href="{% url 'inicio' %}" class="icono-texto {% if pagina_actual == 'pacientes' %}activo{% endif %}">
-                        <i class="bi bi-clipboard2-check" style="font-size: 2rem;"></i>
-                        <p>Pacientes</p>
-                    </a>
-                </div>
+            <!-- Columna de detalles del paciente -->
+            <div class="col-3 d-flex flex-column align-items-start p-3">
+                <!-- Datos del paciente -->
+                <div class="w-100 mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger mb-4">Datos del paciente</h5>
+                        <p><strong>Cédula:</strong> <span id="cedula-text"></span></p>
+                        <p><strong>Teléfono:</strong> <span id="telefono-text"></span></p>
+                        <p><strong>Correo:</strong> <span id="correo-text"></span></p>
+                        <p><strong>Ciudad y Dirección:</strong> <span id="ciudad-text"></span></p>
+                        <p><strong>Edificio:</strong> <span id="edificio-text"></span></p>
 
-
-
-                <div class="col-8 inferior">
-
-                </div>
-
-
-
-                <div class="col-2 d-flex flex-column">
-                    <div class="btn-hor" style="height: 35%; width: 140%; margin-left: 5%; text-align: start;">
-                        <h5 class="mb-3" style="color: #D90404; text-align: start;">Datos del paciente</h5>
-
-                        <p><strong>Cédula:</strong> <span id="cedula-text">{{ paciente.cedula }}</span></p>
-                        <p><strong>Teléfono:</strong> <span id="telefono-text">{{ paciente.telefono }}</span></p>
-                        <p><strong>Correo:</strong> <span id="correo-text">{{ paciente.correo }}</span></p>
-                        <p><strong>Ciudad y Dirección:</strong> <span id="ciudad-text">{{ paciente.ciudad }}</span>, <span
-                                id="direccion-text">{{ paciente.direccion }}</span></p>
-                        <p><strong>Edificio:</strong> <span id="edificio-text">{{ paciente.edificio }}</span></p>
 
                         <!-- Botón para editar la información -->
-                        <div class="text-center">
-                            <button class="btn btn-warning" onclick="editarInformacion()">Editar Información</button>
+                        <div class="text-start mt-3">
+                            <button class="editar-info btn-sm" onclick="editarInformacion()">
+                                Editar Info
+                            </button>
                         </div>
 
-                        <!-- Formulario de edición (inicialmente oculto) -->
-                        <div id="editar-formulario" style="display: none; margin-top: 20px;">
+                        <!-- Formulario de edición (oculto inicialmente) -->
+                        <div id="editar-formulario" class="mt-3" style="display: none;">
                             <form method="post">
                                 {% csrf_token %}
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="cedula" class="form-label">Cédula</label>
                                     <input type="text" class="form-control" id="cedula" name="cedula"
                                         value="{{ paciente.cedula }}">
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="telefono" class="form-label">Teléfono</label>
                                     <input type="text" class="form-control" id="telefono" name="telefono"
                                         value="{{ paciente.telefono }}">
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="correo" class="form-label">Correo</label>
                                     <input type="email" class="form-control" id="correo" name="correo"
                                         value="{{ paciente.correo }}">
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="ciudad" class="form-label">Ciudad</label>
                                     <input type="text" class="form-control" id="ciudad" name="ciudad"
                                         value="{{ paciente.ciudad }}">
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="direccion" class="form-label">Dirección</label>
                                     <input type="text" class="form-control" id="direccion" name="direccion"
                                         value="{{ paciente.direccion }}">
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="edificio" class="form-label">Edificio</label>
                                     <input type="text" class="form-control" id="edificio" name="edificio"
                                         value="{{ paciente.edificio }}">
                                 </div>
-                                <button type="submit" class="btn btn-success" onclick="guardarCambios()">Guardar
-                                    Cambios</button>
+                                <button type="submit" class="btn btn-success me-2">Guardar Cambios</button>
                                 <button type="button" class="btn btn-secondary"
                                     onclick="cancelarEdicion()">Cancelar</button>
                             </form>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Nota del paciente -->
-                    <div id="nota-paciente" class="btn-hor" style="height: 40%; width: 140%; margin-left: 5%;">
-                        <h5 class="mb-3" style="color: #D90404; text-align: start;">Nota del paciente</h5>
-                    </div>
-
-                    <!-- Botones para ver y cargar archivos -->
-                    <div id="archivos-container" class="container text-center mt-5" style="margin-left: 5%; width: 140%;">
-                        <div class="mb-3 button-container">
-                            <button type="button" class="btn btn-primary custom-btn-programar">Ver archivos</button>
-                            <button type="button" class="btn btn-danger custom-btn-borrar">Cargar archivos</button>
+                <!-- Nota del paciente -->
+                <div class="w-100 mb-3">
+                    <h5 class="card-title text-danger mb-4">Nota del paciente</h5>
+                    <div class="card">
+                        <div class="card-body" style="margin: 4rem;">
+                            <p>Contenido de la nota del paciente...</p> <!-- Este se actualizará dinámicamente -->
                         </div>
                     </div>
                 </div>
 
+                <!-- Botones para archivos -->
+                <div class="w-100">
+                    <div class="card-body text-center">
+                        <!-- Botón para ver archivos -->
+                        <button type="button"
+                            class="btn btn-outline-primary w-100 mb-2 d-flex align-items-center justify-content-center"
+                            style="height: 50px; font-size: 18px; border: 2px solid #a0a0a0; background-color: #d3d3d3; color: #000; border-radius: 8px; transition: opacity 0.2s;"
+                            onclick="verArchivos()">
+                            <i class="bi bi-eye" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                            Ver archivos
+                        </button>
+
+                        <form id="formularioCarga" action="/cargar_archivos" method="POST"
+                            enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <!-- Input de archivo oculto -->
+                            <input type="file" id="archivo" name="archivo" class="d-none" accept="application/pdf">
+
+                            <!-- Botón de carga de archivos -->
+                            <button type="button"
+                                class="btn btn-outline-primary w-100 mb-2 d-flex align-items-center justify-content-center"
+                                style="height: 50px; font-size: 18px; border: 2px solid #a0a0a0; background-color: #d3d3d3; color: #000; border-radius: 8px; transition: opacity 0.2s;"
+                                onclick="document.getElementById('archivo').click();">
+                                <i class="bi bi-download" style="font-size: 1.5rem; margin-right: 10px;"></i>
+                                Cargar archivos
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    {% endblock %}
+    </div>
+</body>
+{% endblock %}
 
-    {% block script %}
-        <script>
-            function editarInformacion() {
-                document.getElementById("editar-formulario").style.display = "block";
-                document.getElementById("nota-paciente").style.display = "none";
-                document.getElementById("archivos-container").style.display = "none";
-            }
+{% block script %}
+<script>
 
-            function cancelarEdicion() {
-                document.getElementById("editar-formulario").style.display = "none";
-                document.getElementById("nota-paciente").style.display = "block";
-                document.getElementById("archivos-container").style.display = "block";
-            }
+    function mostrarDetalles(elementoCita) {
+        // Obtiene los datos del paciente desde los atributos data-*
+        const cedula = elementoCita.getAttribute('data-identificacion');
+        const telefono = elementoCita.getAttribute('data-telefono');
+        const correo = elementoCita.getAttribute('data-correo');
+        const ciudad = elementoCita.getAttribute('data-ciudad');
+        const edificio = elementoCita.getAttribute('data-edificio');
+        const nota = elementoCita.getAttribute('data-nota');
 
-            function guardarCambios() {
-                // Aquí puedes agregar lógica para manejar el guardado, si es necesario.
-                cancelarEdicion();
+        // Actualiza los elementos en la sección de detalles
+        document.getElementById('cedula-text').textContent = cedula;
+        document.getElementById('telefono-text').textContent = telefono;
+        document.getElementById('correo-text').textContent = correo;
+        document.getElementById('ciudad-text').textContent = ciudad;
+        document.getElementById('edificio-text').textContent = edificio;
+
+        // Actualiza el contenido de la nota del paciente
+        document.querySelector('.card .card-body p').textContent = nota;
+    }
+
+    // Función para ver archivos
+    function verArchivos() {
+        // Lógica para mostrar los archivos guardados (puedes abrir un modal, redirigir a una página, etc.)
+        alert("Ver archivos");
+    }
+
+    // Función para cargar archivos
+    function cargarArchivos() {
+        var archivoInput = document.getElementById('archivo');
+        var archivo = archivoInput.files[0];
+
+        if (!archivo) {
+            alert("Por favor, selecciona un archivo.");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('archivo', archivo);
+
+        fetch('/cargar_archivos', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Archivo cargado con éxito');
+                } else {
+                    alert('Hubo un error al cargar el archivo');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un error al cargar el archivo');
+            });
+    }
+
+    // Función para obtener el CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
-        </script>
-    {% endblock %}
+        }
+        return cookieValue;
+    }
+
+    function cambiarFecha(dia) {
+        var fechaActual = new Date("{{ fecha_actual }}"); // Pasar la fecha actual desde Django a JS
+        fechaActual.setDate(fechaActual.getDate() + dia); // Sumar o restar días
+
+        // Redirigir con la nueva fecha
+        window.location.href = "?fecha=" + fechaActual.toISOString().split('T')[0];
+    }
+
+
+    // Función para mostrar el formulario de edición
+    function editarInformacion() {
+        document.getElementById('editar-formulario').style.display = 'block';
+    }
+
+    // Función para cancelar la edición
+    function cancelarEdicion() {
+        document.getElementById('editar-formulario').style.display = 'none';
+    }
+</script>
+{% endblock %}
+

@@ -1,120 +1,88 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container-fluid h-100 d-flex flex-column">
-    <div class="row" style="height: 15%;">
-        <div class="col-1 logo">
-            <img src="../../static/img/logo.png" alt="Logo" class="img-fluid" style="margin-top: 25%;">
-        </div>
-        <div class="col-8 d-flex justify-content-center align-items-center">
-            <div class="input-group" style="margin-top: 3%;">
-                <span class="input-group-text"
-                    style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
-                    <i class="bi bi-search"></i>
-                </span>
-                <input type="text" id="fecha" name="fecha" class="form-control rounded-start"
-                    placeholder="Buscar fechas" aria-label="Buscar" style="background-color: #F7F6F7;">
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-md-9 d-flex align-items-center justify-content-start">
+                <!-- Sección del calendario -->
+                <div class="col-12">
+                    <div id="calendario"></div>
+                </div>
             </div>
-        </div>
 
-        <div class="col-2 d-flex justify-content-center align-items-center text-align-start flex-grow-1">
-            <div class="selected-date" id="selectedDates"></div>
-        </div>
-    </div>
+            <div class="col-12 col-md-3 d-flex flex-column">
+                <form method="POST" id="form_cita" action="{% url 'programar_cita' %}">
+                    {% csrf_token %}
 
-    <div class="row flex-fill" style="height: 85%; text-align: center;">
-        <div class="col-1 d-flex flex-column align-items-center justify-content-around">
-            <a href="{% url 'citas' %}" class="icono-texto {% if pagina_actual == 'citas' %}activo{% endif %}">
-                <i class="bi bi-list-task" style="font-size: 2rem;"></i>
-                <p>Citas</p>
-            </a>
-
-            <a href="{% url 'programar_cita' %}"
-                class="icono-texto {% if pagina_actual == 'programar' %}activo{% endif %}">
-                <i class="bi bi-calendar-plus" style="font-size: 2rem;"></i>
-                <p>Programar</p>
-            </a>
-
-            <a href="{% url 'inicio' %}" class="icono-texto {% if pagina_actual == 'pacientes' %}activo{% endif %}">
-                <i class="bi bi-clipboard2-check" style="font-size: 2rem;"></i>
-                <p>Pacientes</p>
-            </a>
-        </div>
-
-        <div class="col-8 inferior">
-            <div id="calendario"></div>
-        </div>
-
-        <div class="col-3 d-flex flex-column">
-            <form method="POST" id="form_cita" action="{% url 'programar_cita' %}">
-                {% csrf_token %}
-
-                <!-- Sección de Selección de Horas -->
-                <div class="container mb-5">
-                    <p class="text-danger display-6" style="text-align: left; font-size: 2rem; margin-bottom: 0.5rem;">
-                        <b>Hora</b>
-                    </p>
-                    <div class="row g-0" style="margin-bottom: 0.25rem;">
-                        {% for hora in horas_disponibles %}
-                        <div class="col-4 p-0">
-                            <button name="horas" value="{{ hora }}:00" class="btn custom-btn w-100"
-                                style="font-size: 0.8rem;" {% if hora in horas_ocupadas %} disabled {% endif %}>
-                                {{ hora }}:00
-                            </button>
+                    <!-- Sección de Selección de Hora -->
+                    <div class="mb-5">
+                        <p class="text-danger display-6"
+                            style="text-align: left; font-size: 2rem; margin-bottom: 0.5rem;">
+                            <b>Hora</b>
+                        </p>
+                        <div class="row g-0 mb-2">
+                            {% for hora in horas_disponibles %}
+                            <div class="col-4 p-0">
+                                <button name="horas" value="{{ hora }}:00" class="btn custom-btn w-100"
+                                    style="font-size: 0.8rem;" {% if hora in horas_ocupadas %} disabled {% endif %}>
+                                    {{ hora }}:00
+                                </button>
+                            </div>
+                            {% if forloop.counter|divisibleby:3 and not forloop.last %}
                         </div>
-                        {% if forloop.counter|divisibleby:3 and not forloop.last %}
-                    </div>
-                    <div class="row g-0" style="margin-bottom: 0.25rem;">
-                        {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Sección de Selección de Ciudad -->
-                <div class="container mb-5">
-                    <h5 class="mb-3 text-start" style="color: #D90404;">Ciudad</h5>
-                    <div class="input-group mb-3">
-                        <select id="city-select" name="ciudad" class="form-select">
-                            <option selected>Seleccionar ciudad...</option>
-                            {% for ciudad in ciudades %}
-                            <option value="{{ ciudad.id }}">{{ ciudad.nombre }}</option>
+                        <div class="row g-0 mb-2">
+                            {% endif %}
                             {% endfor %}
-                        </select>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Sección de Dirección -->
-                <div class="container mb-5">
-                    <h5 class="mb-3 text-start" style="color: #D90404;">Dirección</h5>
-                    <div class="input-group mb-3">
-                        <input type="text" id="address_field" name="direccion" class="form-control">
+                    <!-- Sección de Selección de Ciudad -->
+                    <div class="mb-5">
+                        <h5 class="mb-3 text-start" style="color: #D90404;">Ciudad</h5>
+                        <div class="input-group mb-3">
+                            <select id="city-select" name="ciudad" class="form-select">
+                                <option selected>Seleccionar ciudad...</option>
+                                {% for ciudad in ciudades %}
+                                <option value="{{ ciudad.id }}">{{ ciudad.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Botones de Acción en una Sola Fila -->
-                <div class="container text-center mt-4 d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary me-2 custom-btn-programar"
-                        id="schedule-btn">Programar</button>
-                    <button type="button" class="btn btn-danger custom-btn-borrar"
-                        id="">Borrar</button>
+                    <!-- Sección de Dirección -->
+                    <div class="mb-5">
+                        <h5 class="mb-3 text-start" style="color: #D90404;">Dirección</h5>
+                        <div class="input-group mb-3">
+                            <input type="text" id="address_field" name="direccion" class="form-control"
+                                placeholder="Escribe tu dirección">
+                        </div>
+                    </div>
 
+                    <!-- Botones de Acción -->
+                    <div class="container text-center mt-4 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary me-2 custom-btn-programar"
+                            id="schedule-btn">Programar</button>
+                        <button type="button" class="btn btn-danger custom-btn-borrar">Borrar</button>
+                    </div>
 
+                    <!-- Mensaje de Éxito (Toast) -->
                     <div id="toast-message" class="toast-message" style="display: none;">
                         <i class="fas fa-check-circle"></i>
                         <br>
                         <span>Se ha agendado con éxito.</span>
                     </div>
-            </form>
+                </form>
+            </div>
         </div>
-
-        </form>
     </div>
-</div>
-</div>
+</body>
+
 {% endblock %}
+
 {% block script %}
 <script>
-
     document.getElementById('schedule-btn').addEventListener('click', function (event) {
         event.preventDefault(); // Evita que el botón de enviar haga submit
 
