@@ -36,6 +36,31 @@
 
         /* Contenedor principal */
 
+        .card-hover {
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .card-hover:hover {
+            background-color: #f5b1b4;
+            /* Un tono más oscuro o brillante */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Añadir una sombra suave */
+            cursor: pointer;
+        }
+
+        .text-hover {
+            color: #b51e1e;
+            /* Cambia el color del texto en hover */
+            transition: color 0.3s ease;
+        }
+
+        .text-hover:hover {
+            color: #941414;
+            /* Un tono más oscuro de rojo */
+        }
+
+
         .col-9 {
             display: flex;
             justify-content: center;
@@ -125,7 +150,8 @@
         }
 
         .cita-card {
-            margin-bottom: 0.8rem; /* Espacio entre cada cita */
+            margin-bottom: 0.8rem;
+            /* Espacio entre cada cita */
             display: flex;
             background-color: #fff5f5;
             border: 1px solid #f8c8c8;
@@ -143,7 +169,7 @@
             padding-top: 12px;
             width: 120px;
             text-align: center;
-            white-space: nowrap; 
+            white-space: nowrap;
         }
 
         .cita-info {
@@ -534,10 +560,17 @@
                         style="border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" id="fecha" name="fecha" class="form-control rounded-start"
-                        placeholder="Buscar fechas" aria-label="Buscar" style="background-color: #F7F6F7;">
+                    {% block search %}
+
+                    {% endblock %}
                 </div>
             </div>
+
+            {% block show %}            
+
+
+            {% endblock %}
+
         </div>
 
         <div class="row">

@@ -3,9 +3,6 @@ from django.db import models
 
 
 
-
-# Create your models here.
-
 class Paciente(models.Model):
     from citas.models import Ciudades_disponibles
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='pacientes')

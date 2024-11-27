@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center my-4">Exámenes Médicos de {{ paciente.nombre }} {{ paciente.apellido }}</h2>
+
+
+    {% if examenes %}
+    <div class="row">
+        {% for examen in examenes %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ examen.tipo_examen }}</h5>
+                    <p class="card-text">{{ examen.fecha }}</p>
+
+                    {% if examen.archivo.name|lower.endswith:".pdf" %}
+                    <a href="{{ examen.archivo.url }}" target="_blank" class="btn btn-danger">Ver PDF</a>
+                    {% elif examen.archivo.name|lower.endswith:".jpg" or examen.archivo.name|lower.endswith:".png" %}
+                    <img src="{{ examen.archivo.url }}" alt="{{ examen.tipo_examen }}" class="img-fluid">
+                    {% else %}
+                    <p>Formato no soportado</p>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No hay exámenes médicos para este paciente.</p>
+    {% endif %}
+
+
+</div>
+{% endblock %}

@@ -1,8 +1,24 @@
 {% extends "base.html" %}
 
+
+
+{% block search %}
+<input type="text" id="search-input" name="search" class="form-control rounded-start" placeholder="Buscar pacientes" aria-label="Buscar" style="background-color: #F7F6F7;">
+
+{% endblock %}
+
+{% block show %}
+<div class="col-2 d-flex justify-content-center align-items-center text-align-start flex-grow-1">
+    {% for cita in citas_del_dia %}
+    <p class="selected-date" id="selectedDates">{{ cita.paciente.nombre }} {{ cita.paciente.apellido }} </p>
+    {% endfor %}
+</div>
+{% endblock %}
+
+
+
 {% block content %}
 
-<body>
     <div class="container-fluid">
         <div class="row">
             <!-- Sección principal de contenido -->
@@ -38,13 +54,13 @@
                                         <span>👤</span>
                                     </div>
                                     <div class="paciente-datos">
-                                        <p class="nombre">{{ cita.paciente.nombre }}</p>
+                                        <p class="nombre">{{ cita.paciente.nombre }}  {{ cita.paciente.apellido }}</p>
                                         <p class="edad">Edad {{ cita.paciente.edad }} años</p>
                                     </div>
                                 </div>
                                 <div class="cita-nota">
                                     <p class="nota-titulo">Nota del paciente</p>
-                                    <p class="nota-texto">{{ cita.paciente.nota }}</p>
+                                    <p class="nota-texto">{{ paciente.nota }}</p>
                                 </div>
                             </div>
                         </div>
@@ -125,7 +141,7 @@
                     <h5 class="card-title text-danger mb-4">Nota del paciente</h5>
                     <div class="card">
                         <div class="card-body" style="margin: 4rem;">
-                            <p>Contenido de la nota del paciente...</p> <!-- Este se actualizará dinámicamente -->
+                            <p></p> <!-- Este se actualizará dinámicamente -->
                         </div>
                     </div>
                 </div>
@@ -162,7 +178,6 @@
             </div>
         </div>
     </div>
-</body>
 {% endblock %}
 
 {% block script %}
@@ -170,7 +185,7 @@
 
     function mostrarDetalles(elementoCita) {
         // Obtiene los datos del paciente desde los atributos data-*
-        const cedula = elementoCita.getAttribute('data-identificacion');
+        const cedula = elementoCita.getAttribute('data-cedula');
         const telefono = elementoCita.getAttribute('data-telefono');
         const correo = elementoCita.getAttribute('data-correo');
         const ciudad = elementoCita.getAttribute('data-ciudad');
@@ -244,9 +259,23 @@
         return cookieValue;
     }
 
+    var fechaActual = new Date("{{ fecha_actual|date:'Y-m-d' }}");
+    console.log("Fecha actual desde Django:", "{{ fecha_actual|date:'Y-m-d' }}");
+    console.log("Objeto Date creado:", fechaActual);
+
+    if (isNaN(fechaActual.getTime())) {
+        console.error("Fecha inválida:", fechaActual);
+    } else {
+        console.log("Fecha válida:", fechaActual);
+    }
+
     function cambiarFecha(dia) {
-        var fechaActual = new Date("{{ fecha_actual }}"); // Pasar la fecha actual desde Django a JS
+        if (isNaN(fechaActual.getTime())) {
+            console.error("Fecha inválida al intentar cambiarla");
+            return;  // Salir si la fecha es inválida
+        }
         fechaActual.setDate(fechaActual.getDate() + dia); // Sumar o restar días
+        console.log("Fecha después de cambiar:", fechaActual);
 
         // Redirigir con la nueva fecha
         window.location.href = "?fecha=" + fechaActual.toISOString().split('T')[0];

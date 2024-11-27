@@ -1,5 +1,22 @@
 {% extends "base.html" %}
 
+{% block search %}
+
+<input type="text" id="fecha" name="fecha" class="form-control rounded-start" placeholder="Buscar fechas"
+    aria-label="Buscar" style="background-color: #F7F6F7;">
+
+{% endblock %}
+
+
+{% block show %}
+<div class="col-2 d-flex justify-content-center align-items-center text-align-start flex-grow-1">
+    <div class="selected-date" id="selectedDates"></div>
+</div>
+{% endblock %}
+
+
+
+
 {% block content %}
 
 <body>
